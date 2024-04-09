@@ -29,12 +29,18 @@ int main(int argc, char *argv[])
             SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF));
             SDL_UpdateWindowSurface(window);
 
-            SDL_Event e; bool quit = false; while( quit == false ){ while( SDL_PollEvent( &e ) ){ if( e.type == SDL_QUIT ) quit = true; } }
+            // SDL_Event e; bool quit = false; while( quit == false ){ while( SDL_PollEvent( &e ) ){ if( e.type == SDL_QUIT ) quit = true; } }
+            // hack to make the window on and movable
 
 
+            SDL_Delay(5000); //5secs
 
+            SDL_DestroyWindow(window);
+
+            
         }
     }
 
+    SDL_Quit(); 
     return 0;
 }
