@@ -4,43 +4,85 @@
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
-SDL_Surface* screenSurface = nullptr;
+SDL_Window *window = NULL;
+SDL_Surface *surface, *draw = NULL;
+
 
 using namespace std;
-int main(int argc, char *argv[])
-{
-    SDL_Window *window = NULL;
-    SDL_Surface *surface = NULL;
+bool init(){
+    bool success = true;
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        cout<< "Error, couldnt be initialized, " << SDL_GetError() << endl;
+    if (SDL_Init(SDL_INIT_VIDEO) < 0){
+        cout<< "Error" << SDL_GetError() << endl;
+        return false;
     }
     else{
-        window = SDL_CreateWindow("first win", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED_MASK, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-        // cin.get();
+        window = SDL_CreateWindow("test win", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+
         if (window == NULL){
-            cout<< "window couldnt be created! " << SDL_GetError() << endl;
+            cout<< "Error" << SDL_GetError() << endl;
         }
-
         else{
-
-            screenSurface = SDL_GetWindowSurface( window );
-            SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF));
-            SDL_UpdateWindowSurface(window);
-
-            // SDL_Event e; bool quit = false; while( quit == false ){ while( SDL_PollEvent( &e ) ){ if( e.type == SDL_QUIT ) quit = true; } }
-            // hack to make the window on and movable
-
-
-            SDL_Delay(5000); //5secs
-
-            SDL_DestroyWindow(window);
-
+            surface = SDL_GetWindowSurface(window);
             
         }
     }
 
-    SDL_Quit(); 
+    return success;
+}
+
+
+bool loadMedia() {
+    bool success = true;
+
+    draw = SDL_LoadBMP("first.bmp");
+    if (draw == NULL) {
+        cout<< "error loading image" << SDL_GetError() <<endl;
+    }
+
+    return success;
+}
+
+void close(){
+    SDL_FreeSurface( draw );
+    draw = NULL;
+
+    SDL_DestroyWindow( window );
+    window = NULL;
+
+    SDL_Quit();
+}
+
+int main(int argc, char* args[]){
+
+    if (!init()) {
+        cout<<"error"<<SDL_GetError()<<endl;
+    }
+    else{
+        if (!loadMedia()){
+            cout<< "failed to load media" <<endl;
+        }
+        else{
+
+            bool quit = false;
+            SDL_Event e;
+
+            while (!quit){
+                while( SDL_PollEvent( &e ) != 0 ){
+                    if( e.type == SDL_QUIT ) {
+                        quit = true;
+                    }
+                }
+
+                SDL_BlitSurface( draw, NULL, surface, NULL );
+                SDL_UpdateWindowSurface(window);
+                // SDL_Event e; bool quit = false; while( quit == false ){ while( SDL_PollEvent( &e ) ){ if( e.type == SDL_QUIT ) quit = true; } }
+
+            } 
+        }
+    }
+
+    close();
+
     return 0;
 }
